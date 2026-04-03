@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 경험으로 AI 캐릭터 만들기 — 크래프톤</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0a0a0f;min-height:100vh;display:flex;flex-direction:column;align-items:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:2rem 1.25rem;}
+.sys-tag{font-size:10px;font-weight:500;letter-spacing:0.14em;color:#D85A30;border:1px solid rgba(216,90,48,0.4);border-radius:4px;padding:3px 12px;display:inline-block;margin-bottom:10px;}
+.main-title{font-size:22px;font-weight:500;color:#fff;margin-bottom:4px;text-align:center;}
+.main-sub{font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:2rem;text-align:center;}
+.qa-card{width:100%;max-width:560px;background:#13131f;border:1px solid #2a2a4a;border-radius:16px;padding:1.75rem;margin-bottom:1rem;}
+.q-label{font-size:10px;font-weight:500;color:#D85A30;letter-spacing:0.12em;margin-bottom:12px;}
+.q-text{font-size:18px;font-weight:500;color:#fff;line-height:1.5;margin-bottom:8px;}
+.q-sub{font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:20px;line-height:1.6;}
+.examples{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+.ex-chip{background:rgba(216,90,48,0.1);border:1px solid rgba(216,90,48,0.25);border-radius:20px;padding:5px 12px;font-size:11px;color:#F5C4B3;cursor:pointer;transition:background 0.2s;line-height:1.4;}
+.ex-chip:hover{background:rgba(216,90,48,0.22);}
+.textarea-wrap{position:relative;margin-bottom:20px;}
+textarea{width:100%;background:#0d0d1a;border:1px solid #2a2a4a;border-radius:10px;padding:14px 16px;color:#fff;font-size:13px;line-height:1.7;resize:none;outline:none;font-family:inherit;transition:border-color 0.2s;min-height:130px;}
+textarea:focus{border-color:#D85A30;}
+textarea::placeholder{color:rgba(255,255,255,0.18);}
+.char-count{position:absolute;bottom:10px;right:14px;font-size:10px;color:rgba(255,255,255,0.2);}
+.gen-btn{width:100%;background:#D85A30;color:#fff;border:none;border-radius:10px;padding:16px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.2s,transform 0.1s;letter-spacing:0.04em;}
+.gen-btn:hover{background:#F0997B;transform:scale(1.02);}
+.gen-btn:active{transform:scale(0.97);}
+.guide-card{width:100%;max-width:560px;background:#13131f;border:1px solid #2a2a4a;border-radius:16px;padding:1.5rem;display:none;margin-bottom:1rem;}
+.guide-card.show{display:block;}
+.guide-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.guide-icon{width:36px;height:36px;border-radius:10px;background:rgba(29,158,117,0.15);border:1px solid rgba(29,158,117,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.guide-title{font-size:15px;font-weight:500;color:#fff;}
+.guide-sub{font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;}
+.steps{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.step{display:flex;align-items:flex-start;gap:12px;}
+.step-num{width:24px;height:24px;border-radius:50%;background:#D85A30;color:#fff;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;}
+.step-text b{color:#fff;font-weight:500;}
+.prompt-preview{background:#0d0d1a;border:1px solid #2a2a4a;border-radius:8px;padding:12px 14px;margin-bottom:16px;}
+.pp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.pp-label{font-size:10px;color:#888780;letter-spacing:0.1em;}
+.copy-btn{background:rgba(216,90,48,0.15);border:1px solid rgba(216,90,48,0.3);border-radius:4px;padding:3px 10px;color:#D85A30;font-size:10px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.2s;}
+.copy-btn:hover{background:rgba(216,90,48,0.3);}
+.copy-btn.copied{background:rgba(29,158,117,0.15);border-color:rgba(29,158,117,0.3);color:#1D9E75;}
+.pp-text{font-size:12px;color:rgba(255,255,255,0.55);line-height:1.7;white-space:pre-wrap;}
+.open-btn{width:100%;background:#1D9E75;color:#fff;border:none;border-radius:10px;padding:15px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.2s,transform 0.1s;text-decoration:none;display:block;text-align:center;letter-spacing:0.04em;margin-bottom:8px;}
+.open-btn:hover{background:#0F6E56;transform:scale(1.02);}
+.open-btn:active{transform:scale(0.97);}
+.also-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.also-btn{border:1px solid #2a2a4a;border-radius:8px;padding:10px;text-align:center;cursor:pointer;transition:all 0.2s;text-decoration:none;display:block;background:#0d0d1a;}
+.also-btn:hover{border-color:#D85A30;background:#1a100a;}
+.also-name{font-size:12px;font-weight:500;margin-bottom:2px;}
+.also-sub{font-size:10px;color:#5F5E5A;}
+.retry-btn{width:100%;background:rgba(216,90,48,0.1);border:1px solid rgba(216,90,48,0.25);border-radius:8px;padding:11px;color:#D85A30;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;}
+.retry-btn:hover{background:rgba(216,90,48,0.2);}
+.notice{font-size:11px;color:rgba(255,255,255,0.2);text-align:center;margin-top:12px;line-height:1.7;}
+</style>
+</head>
+<body>
+
+<div class="sys-tag">3주차 — 상상력과 기술의 결합</div>
+<div class="main-title">나의 경험으로 AI 캐릭터 만들기</div>
+<div class="main-sub">당신의 이야기를 쓰면 ChatGPT가 캐릭터 이미지를 만들어줘요</div>
+
+<div class="qa-card">
+  <div class="q-label">Q. 당신에게 묻습니다</div>
+  <div class="q-text">"살면서 정말 참신하다고 느꼈던 순간이 있나요?"</div>
+  <div class="q-sub">직접 만들었든, 보고 놀랐든 뭐든 좋아요.<br>엉뚱해도, 두서없어도 괜찮아요. 그냥 솔직하게 써주세요.</div>
+  <div class="examples">
+    <div class="ex-chip" onclick="fillEx(this)">퇴근 후 혼자 만든 툴이 팀 전체 업무가 됐어요</div>
+    <div class="ex-chip" onclick="fillEx(this)">요리 레시피로 코드 구조를 설명했더니 모두가 이해했어요</div>
+    <div class="ex-chip" onclick="fillEx(this)">낙서장을 게임 기획서로 바꿔서 제출한 적 있어요</div>
+    <div class="ex-chip" onclick="fillEx(this)">전혀 관련 없는 두 아이디어를 합쳐서 문제를 해결했어요</div>
+  </div>
+  <div class="textarea-wrap">
+    <textarea id="user-input" placeholder="여기에 자유롭게 써주세요..." maxlength="400" oninput="onInput()"></textarea>
+    <span class="char-count"><span id="char-cnt">0</span>/400</span>
+  </div>
+  <button class="gen-btn" onclick="generate()">내 캐릭터 만들기 →</button>
+</div>
+
+<div class="guide-card" id="guide-card">
+  <div class="guide-header">
+    <div class="guide-icon">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 2L11 7H16L12 10.5L13.5 15.5L9 12.5L4.5 15.5L6 10.5L2 7H7Z" fill="#1D9E75"/>
+      </svg>
+    </div>
+    <div>
+      <div class="guide-title">캐릭터 프롬프트가 준비됐어요!</div>
+      <div class="guide-sub">아래 버튼을 누르면 ChatGPT가 자동으로 열려요</div>
+    </div>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text"><b>ChatGPT 열기</b> 버튼을 누르면 프롬프트가 자동 입력된 채로 열려요</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">ChatGPT 창이 열리면 <b>Enter 또는 전송 버튼</b>을 누르세요</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">잠깐 기다리면 <b>당신만의 AI 캐릭터 이미지</b>가 생성돼요</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">마음에 드는 이미지를 <b>저장 후 공모전에 제출</b>하세요</div>
+    </div>
+  </div>
+
+  <div class="prompt-preview">
+    <div class="pp-header">
+      <div class="pp-label">자동 입력될 프롬프트 미리보기</div>
+      <button class="copy-btn" id="copy-btn" onclick="copyPrompt()">복사하기</button>
+    </div>
+    <div class="pp-text" id="prompt-preview-text"></div>
+  </div>
+
+  <a class="open-btn" id="gpt-link" href="#" target="_blank">ChatGPT에서 캐릭터 만들기 →</a>
+
+  <div style="font-size:11px;color:#5F5E5A;margin-bottom:8px;">다른 AI로도 만들 수 있어요 (프롬프트 복사 후 붙여넣기)</div>
+  <div class="also-row">
+    <a class="also-btn" id="claude-link" href="https://claude.ai" target="_blank">
+      <div class="also-name" style="color:#AFA9EC;">Claude</div>
+      <div class="also-sub">claude.ai</div>
+    </a>
+    <a class="also-btn" id="gemini-link" href="https://gemini.google.com" target="_blank">
+      <div class="also-name" style="color:#EF9F27;">Gemini</div>
+      <div class="also-sub">gemini.google.com</div>
+    </a>
+  </div>
+
+  <a href="https://tally.so/r/xXy2VJ" target="_blank" style="width:100%;background:#534AB7;color:#fff;border:none;border-radius:10px;padding:15px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.2s,transform 0.1s;text-decoration:none;display:block;text-align:center;letter-spacing:0.04em;margin-bottom:8px;">제출 바로가기 →</a>
+  <button class="retry-btn" onclick="retry()">처음부터 다시 쓰기</button>
+  <div class="notice">
+    ChatGPT Plus(유료) 계정에서 DALL-E 이미지 생성이 가능해요.<br>
+    무료 계정이라면 프롬프트 복사 후 Claude 또는 Gemini를 이용해주세요.
+  </div>
+</div>
+
+<script>
+var currentPrompt = "";
+
+function onInput(){
+  document.getElementById('char-cnt').textContent = document.getElementById('user-input').value.length;
+}
+
+function fillEx(el){
+  document.getElementById('user-input').value = el.textContent.trim();
+  onInput();
+}
+
+function buildPrompt(userText){
+  return "나는 크래프톤 사내 AI 캐릭터 공모전에 참여 중이야. 핵심가치는 \"상상력과 기술의 결합\"이야.\n\n내가 살면서 참신하다고 느꼈던 경험이야:\n\"" + userText + "\"\n\n위의 경험을 바탕으로 나를 표현하는 AI 캐릭터 이미지를 만들어줘.\n\n캐릭터 조건:\n- 이 경험의 본질(창의성, 연결, 도전 등)을 시각적으로 표현할 것\n- 게임 캐릭터 스타일, 선명하고 개성 있는 외형\n- 상상력과 기술이 결합된 느낌 (예술적이면서도 미래적인 디자인)\n- 배경 포함, 풀샷 또는 상반신\n- 고퀄리티 디지털 일러스트 스타일\n\n이미지 1장을 만들어줘!";
+}
+
+function generate(){
+  var input = document.getElementById('user-input').value.trim();
+  if(!input){ document.getElementById('user-input').focus(); return; }
+
+  var prompt = buildPrompt(input);
+  currentPrompt = prompt;
+
+  document.getElementById('prompt-preview-text').textContent = prompt;
+
+  var encoded = encodeURIComponent(prompt);
+  document.getElementById('gpt-link').href = "https://chat.openai.com/?q=" + encoded;
+  document.getElementById('claude-link').href = "https://claude.ai/new?q=" + encoded;
+  document.getElementById('gemini-link').href = "https://gemini.google.com/app?q=" + encoded;
+
+  var copyBtn = document.getElementById('copy-btn');
+  copyBtn.textContent = '복사하기';
+  copyBtn.classList.remove('copied');
+
+  document.getElementById('guide-card').classList.add('show');
+  setTimeout(function(){
+    document.getElementById('guide-card').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 100);
+}
+
+function copyPrompt(){
+  if(!currentPrompt) return;
+  var btn = document.getElementById('copy-btn');
+  function done(){
+    btn.textContent = '복사됨!';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = '복사하기'; btn.classList.remove('copied'); }, 2000);
+  }
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(currentPrompt).then(done).catch(function(){ fallback(); done(); });
+  } else { fallback(); done(); }
+}
+
+function fallback(){
+  var ta = document.createElement('textarea');
+  ta.value = currentPrompt;
+  ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  document.execCommand('copy'); document.body.removeChild(ta);
+}
+
+function retry(){
+  document.getElementById('guide-card').classList.remove('show');
+  document.getElementById('user-input').value = '';
+  document.getElementById('char-cnt').textContent = '0';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>
